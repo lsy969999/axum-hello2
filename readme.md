@@ -6,4 +6,5 @@ cargo add serde_json
 cargo add tracing
 cargo add tracing-subscriber --features env-filter
 cargo add axum
+cargo add sqlx --features postgres runtime-tokio
 ```
