@@ -9,6 +9,7 @@ use serde::{Serialize, Deserialize};
 use serde_json::json;
 use sqlx::{postgres::PgPoolOptions, PgPool};
 use tokio::net::TcpListener;
+use tower_http::services::ServeDir;
 use tracing::{debug, Level};
 use askama::Template;
 
@@ -35,10 +36,15 @@ async fn main() {
                   .expect("can't connect to database");
 
     let app = Router::new()
+                .route("/", get(idx))
+                .route("/messages", get(||async {
+                  Html("<span class='test'>haha</span><script>console.log('dudu');</script>")
+                }))
                 .route("/greet/:name", get(greet))
                 .route("/sample", get(get_sample_entity))
                 .route("/authorize", post(authorize))
                 .route("/protected", get(protected))
+                .nest_service("/assets", ServeDir::new("assets"))
                 .with_state(pool);
 
     let listener = TcpListener::bind("127.0.0.1:3000")
@@ -48,6 +54,12 @@ async fn main() {
     debug!("listening on {}", listener.local_addr().unwrap());
     axum::serve(listener, app).await.unwrap();
 
+}
+#[derive(Template)]
+#[template(path="index.html")]
+struct IdxTemplate{}
+async fn idx()-> impl IntoResponse{
+  HtmlTemplate(IdxTemplate{})
 }
 
 #[derive(Template)]

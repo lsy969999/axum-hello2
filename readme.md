@@ -10,4 +10,5 @@ cargo add sqlx --features postgres runtime-tokio
 cargo add once_cell
 cargo add jsonwebtoken
 cargo add axum-extra --features typed-header
+cargo add tower --features util
 ```
